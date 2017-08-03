@@ -1,0 +1,33 @@
+# depslib dependency file v1.0
+1501792534 source:c:\users\nooby\desktop\code_blocks_projects\rubik\main.cpp
+	"Cube.h"
+	<iostream>
+	"UnitTest++.h"
+
+1281278224 c:\users\nooby\desktop\downloads\codeblocks16\extra_moodle\glfw-2.7.bin.win32\include\gl\glfw.h
+	<OpenGL/gl.h>
+	<OpenGL/glu.h>
+	<GL/gl.h>
+	<GL/glu.h>
+
+1501792066 c:\users\nooby\desktop\code_blocks_projects\rubik\cube.h
+	"CubeSide.h"
+	<stack>
+
+1501785735 c:\users\nooby\desktop\code_blocks_projects\rubik\cubeside.h
+
+1501785664 source:c:\users\nooby\desktop\code_blocks_projects\rubik\cubeside.cpp
+	"CubeSide.h"
+	<string.h>
+	<iostream>
+
+1501792501 source:c:\users\nooby\desktop\code_blocks_projects\rubik\cube.cpp
+	"Cube.h"
+	<GL/glfw.h>
+	<iostream>
+	<memory>
+
+1501792373 source:c:\users\nooby\desktop\code_blocks_projects\rubik\unittests.cpp
+	"Cube.h"
+	"UnitTest++.h"
+

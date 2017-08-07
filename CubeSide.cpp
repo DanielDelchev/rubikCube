@@ -106,3 +106,37 @@ bool CubeSide::operator==(const CubeSide &given)const{
 
     return result;
 }
+
+// designed for square matrices only!
+void CubeSide::transponate(){
+    int dim = getDimention();
+    for (int row=0;row<dim;row++){
+        for (int column=0;column<dim;column++){
+            if (column < row){
+                continue;
+            }
+            std::swap(getWall()[row][column],getWall()[column][row]);
+        }
+    }
+
+}
+
+void CubeSide::reverseColumns(){
+    int dim = getDimention();
+    for (int column=0;column<dim;column++){
+        int half = dim/2;
+        for (int row=0;row<half;row++){
+            std::swap(getWall()[row][column],getWall()[dim-1-row][column]);
+        }
+    }
+}
+
+void CubeSide::reverseRows(){
+    int dim = getDimention();
+    for (int row=0;row<dim;row++){
+        int half = dim/2;
+        for (int column=0;column<half;column++){
+            std::swap(getWall()[row][column],getWall()[row][dim-1-column]);
+        }
+    }
+}

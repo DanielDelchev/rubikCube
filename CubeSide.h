@@ -35,6 +35,9 @@ public:
 
     void print(); //for debugging purposes
     void paint(Color clr);
+    void transponate();
+    void reverseRows();
+    void reverseColumns();
 
 private:
     void copy(const CubeSide &given);

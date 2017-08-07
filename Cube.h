@@ -29,6 +29,7 @@ struct Turn{
     Mode mode;
     int choice;
     Direction dir;
+    Turn(Mode _mode, int _choice, Direction _dir):mode(_mode), choice (_choice), dir (_dir){}
 };
 
 
@@ -66,7 +67,7 @@ public:
 
     bool operator== (const Cube &given)const;
 
-    void draw(int length);
+    void draw(int length,float Cx = 0, float Cy = 0, float Cz = 0);
     void turn(Direction dir);
     void print(); //for debugging purposes
     void solve(); //apply all turns in history in reverse direction
@@ -78,6 +79,8 @@ public:
     inline void setChoice(int _choice){
         choice = _choice;
     }
+
+    void randomize(int count = 16);
 
 private:
 

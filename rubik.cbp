@@ -45,6 +45,8 @@
 		<Unit filename="Cube.h" />
 		<Unit filename="CubeSide.cpp" />
 		<Unit filename="CubeSide.h" />
+		<Unit filename="GUI.cpp" />
+		<Unit filename="UnitTests.cpp" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<code_completion />

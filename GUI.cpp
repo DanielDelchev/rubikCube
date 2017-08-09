@@ -4,6 +4,23 @@
 #include <cmath>
 
 
+
+/**@TODO
+    *revise how lighting vector works so as to figure out how to make the chosen row paler
+    *see multhithreading specifics in glfw and key callbacks
+    *if nothing relevant, see what will happen if we use std::thread and in each of them
+    *define a callback for a single key
+    *finish unit tests
+    *start gui implementation of Cube
+    *DO NOT FORGET THAT THERE IS ROTATING IN THE VIEW POINT KEY CALLBACK WHICH MIGHT CAUSE PROBLEMS LATER
+    *ALTHOUGH IF IT THE CALLBACK GETS LOCKED/DISABLED WHILE SPINNINNG ANIMATION OCCURS, THERE OUGHT NOT BE A PROBLEM
+    *POSSIBLY AWAIT WILL BE USED BY THE OOP TURN FUNCTION WAITING FOR THE GUI TURN TO END ?
+
+    also spinning could use more testing to check if some combinations of alpha+beta changes cause abnormalities in the GUI
+    this could be testet later on by beta testers ?
+
+*/
+
 //callback function for mouse scroll motion is of type : void (*) (int)
 //so these following arguments are global, they are also static, so thy would not be
 //used when linking
@@ -30,50 +47,6 @@ void scrollFunction (int scrollPosition){
         lastScrollPosition = scrollPosition;
 }
 
-
-/*
-void moveFunction (int xPos, int yPos){
-
-    //step MUST be a number, so that (int) beta % 180 == 0 will be true an odd number of times!
-    const float STEP = 0.2;
-
-    if (xPos > lastXpos){
-        beta += STEP;
-    }
-    if (xPos <lastXpos){
-        beta -= STEP;
-    }
-    if (yPos > lastYpos){
-        alpha -= STEP;
-    }
-    if (yPos < lastYpos){
-        alpha += STEP;
-    }
-
-    if ( (int) beta % 180 == 0){
-            (rot == 0) ? (rot=180) : (rot=0);
-        }
-
-    lastXpos = xPos;
-    lastYpos = yPos;
-
-}
-
-
-void mouseClick(int buttonID,int state){
-    if (buttonID == GLFW_MOUSE_BUTTON_LEFT){
-        if (state == GLFW_PRESS){
-            glfwGetMousePos(&lastXpos,&lastYpos);
-            glfwSetMousePosCallback( moveFunction );
-        }
-        else {
-            glfwSetMousePosCallback( NULL );
-        }
-    }
-}
-*/
-
-
 //this function is good enough by itselfF
 //perhaps see if we can use callback on buttons with multhitheading?
 void mover(int buttonID,int state){
@@ -89,6 +62,7 @@ void mover(int buttonID,int state){
                 beta %= 360;
                 if ( (beta % 180) == 0 ){
                     (rot == 0) ? (rot=180) : (rot=0);
+                    beta--;
                 }
             }
             else if (state == GLFW_RELEASE){
@@ -103,6 +77,7 @@ void mover(int buttonID,int state){
                 beta %= 360;
                 if ( (beta % 180) == 0 ){
                     (rot == 0) ? (rot=180) : (rot=0);
+                    beta++;
                 }
             else if (state == GLFW_RELEASE){
                 glfwDisable( GLFW_KEY_REPEAT);
@@ -138,8 +113,6 @@ void mover(int buttonID,int state){
 
 }
 
-
-
 void Cube::draw(int length, float Cx , float Cy , float Cz){
 
     int     width, height;
@@ -164,7 +137,6 @@ void Cube::draw(int length, float Cx , float Cy , float Cz){
     glfwSetWindowSize(512,512);
 
     glfwSetMouseWheelCallback( scrollFunction );
-//    glfwSetMouseButtonCallback( mouseClick );
     glfwSetKeyCallback( mover );
 
     while(running)
@@ -192,18 +164,23 @@ void Cube::draw(int length, float Cx , float Cy , float Cz){
         //used so that the vector representing the position of the eye does never match the vector representing the upside of the scene
         // see gluLookAt specification for more details;
         float error = 0.0001;
+        static_cast <void> (error); //this should be added to X and Y to prevent the forespoken problem, since it is not possible for the
+        // beta angle to become a multiple of 2*PI this problem is considered solved, yet if refactoring is requirred, this
+        // variable stands as a reminder. it has been cast to void so as to not trigger compiler warnings and to tell the
+        //reader of the code that it is not used
 
-        float X = R*cos(alphaRads)*sin(betaRads)+Cx+error;
-        float Y = R*sin(alphaRads)*sin(betaRads)+Cy+error;
+        float X = R*cos(alphaRads)*sin(betaRads)+Cx;
+        float Y = R*sin(alphaRads)*sin(betaRads)+Cy;
         float Z = R*cos(betaRads)+Cz;
 
+
         glRotatef(rot, 0.0f, 0.0f, 1.0f);
+
+        std::cout<<alpha<<" "<<beta<<std::endl;
 
         gluLookAt(X, Y, Z,
                 Cx, Cy, Cz,
                 0.0f, 0.0f, 1 );
-
-
 
 
 

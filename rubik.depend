@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1502302317 source:c:\users\nooby\desktop\code_blocks_projects\rubik\main.cpp
+1502572038 source:c:\users\nooby\desktop\code_blocks_projects\rubik\main.cpp
 	"Cube.h"
 	<iostream>
 	"UnitTest++.h"
@@ -31,7 +31,7 @@
 	"Cube.h"
 	"UnitTest++.h"
 
-1502569376 source:c:\users\nooby\desktop\code_blocks_projects\rubik\gui.cpp
+1502572215 source:c:\users\nooby\desktop\code_blocks_projects\rubik\gui.cpp
 	"Cube.h"
 	<GL/glfw.h>
 	<iostream>

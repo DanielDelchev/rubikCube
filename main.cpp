@@ -7,7 +7,7 @@ int main()
 
     Cube T = Cube();
 //    T.print();
-    T.draw(2,1,1,1);
+    T.draw(2,0,0,0);
 
     return UnitTest::RunAllTests();
 

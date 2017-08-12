@@ -7,9 +7,6 @@
 
 /**@TODO
     *revise how lighting vector works so as to figure out how to make the chosen row paler
-    *see multhithreading specifics in glfw and key callbacks
-    *if nothing relevant, see what will happen if we use std::thread and in each of them
-    *define a callback for a single key
     *finish unit tests
     *start gui implementation of Cube
     *DO NOT FORGET THAT THERE IS ROTATING IN THE VIEW POINT KEY CALLBACK WHICH MIGHT CAUSE PROBLEMS LATER
@@ -32,14 +29,13 @@
 // file local variables and constants
 static const float EPS = 0.01;
 static const float STEP = 0.04;
-static int rotationView = 0;
 static float R = 5;
 static double alpha = 45;
 static double beta = 45;
 static int lastScrollPosition = 0;
 static const int HALF_CIRCLE = 180;
 static const int CIRCLE = 360;
-
+static int upside = 1;
 
 void scrollFunction (int scrollPosition){
         const int LIMIT = 10;
@@ -60,9 +56,8 @@ void modifyPOV(){
             beta = 0;
         }
         if  ( (fabs(beta + HALF_CIRCLE) < EPS) || (fabs(beta - HALF_CIRCLE) < EPS) || (fabs(beta) < EPS) ){
-            (rotationView == 0) ? (rotationView=HALF_CIRCLE) : (rotationView=0);
-            //{ std::cout<<"rotation:"<<std::endl;}
             beta -= STEP;
+            upside *= (-1);
         }
     }
     if (glfwGetKey(GLFW_KEY_DOWN) == GLFW_PRESS){
@@ -71,23 +66,22 @@ void modifyPOV(){
             beta = 0;
         }
         if ( (fabs(beta - HALF_CIRCLE) < EPS) || (fabs(beta + HALF_CIRCLE) < EPS) || (fabs(beta) < EPS) ){
-            (rotationView == 0) ? (rotationView=HALF_CIRCLE) : (rotationView=0);
-            //{ std::cout<<"rotation:"<<std::endl;}
             beta += STEP;
+            upside *= (-1);
         }
 
     }
     if (glfwGetKey(GLFW_KEY_LEFT) == GLFW_PRESS){
-        alpha -= STEP;
+        alpha -= STEP*upside;
         if ( (fabs(alpha - CIRCLE) < EPS) || (fabs(alpha + CIRCLE) < EPS) ){
             alpha = 0;
         }
     }
     if (glfwGetKey(GLFW_KEY_RIGHT) == GLFW_PRESS){
-        alpha += STEP;
+        alpha += STEP*upside;
         if ( (fabs(alpha - CIRCLE) < EPS) || (fabs(alpha + CIRCLE) < EPS) ){
             alpha = 0;
-        }
+       }
     }
 }
 
@@ -224,14 +218,11 @@ void Cube::draw(int length, float Cx , float Cy , float Cz){
         double Y = R*sin(alphaRads)*sin(betaRads)+Cy;
         double Z = R*cos(betaRads)+Cz;
 
-
-        glRotatef(rotationView, 0.0f, 0.0f, 1.0f);
-
         //std::cout<<alpha<<" "<<beta<<std::endl;
 
         gluLookAt(X, Y, Z,
                 Cx, Cy, Cz,
-                0.0f, 0.0f, 1 );
+                0.0f, 0.0f, upside );
         draw_example_cube(length,Cx,Cy,Cz);
 
         modifyPOV();

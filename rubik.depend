@@ -31,9 +31,11 @@
 	"Cube.h"
 	"UnitTest++.h"
 
-1502309956 source:c:\users\nooby\desktop\code_blocks_projects\rubik\gui.cpp
+1502569376 source:c:\users\nooby\desktop\code_blocks_projects\rubik\gui.cpp
 	"Cube.h"
 	<GL/glfw.h>
 	<iostream>
 	<cmath>
+	<thread>
+	<mutex>
 

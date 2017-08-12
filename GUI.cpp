@@ -2,8 +2,8 @@
 #include <GL/glfw.h>
 #include <iostream>
 #include <cmath>
-
-
+#include <thread>
+#include <mutex>
 
 /**@TODO
     *revise how lighting vector works so as to figure out how to make the chosen row paler
@@ -28,11 +28,17 @@
 
 #define PI 3.14
 
-static int rot = 0;
+
+// file local variables and constants
+static const float EPS = 0.01;
+static const float STEP = 0.04;
+static int rotationView = 0;
 static float R = 5;
-static int alpha = 45;
-static int beta = 45;
+static double alpha = 45;
+static double beta = 45;
 static int lastScrollPosition = 0;
+static const int HALF_CIRCLE = 180;
+static const int CIRCLE = 360;
 
 
 void scrollFunction (int scrollPosition){
@@ -47,70 +53,128 @@ void scrollFunction (int scrollPosition){
         lastScrollPosition = scrollPosition;
 }
 
-//this function is good enough by itselfF
-//perhaps see if we can use callback on buttons with multhitheading?
-void mover(int buttonID,int state){
-
-    const int STEP = 1;
-
-    switch (buttonID){
-
-        case GLFW_KEY_UP:
-            if (state == GLFW_PRESS){
-                glfwEnable( GLFW_KEY_REPEAT);
-                beta -= STEP;
-                beta %= 360;
-                if ( (beta % 180) == 0 ){
-                    (rot == 0) ? (rot=180) : (rot=0);
-                    beta--;
-                }
-            }
-            else if (state == GLFW_RELEASE){
-                glfwDisable( GLFW_KEY_REPEAT);
-            }
-            break;
-
-        case GLFW_KEY_DOWN:
-            if (state == GLFW_PRESS){
-                glfwEnable( GLFW_KEY_REPEAT);
-                beta += STEP;
-                beta %= 360;
-                if ( (beta % 180) == 0 ){
-                    (rot == 0) ? (rot=180) : (rot=0);
-                    beta++;
-                }
-            else if (state == GLFW_RELEASE){
-                glfwDisable( GLFW_KEY_REPEAT);
-                }
-            }
-            break;
-
-
-        case GLFW_KEY_LEFT:
-            if (state == GLFW_PRESS){
-                glfwEnable( GLFW_KEY_REPEAT);
-                alpha -= STEP;
-                alpha %= 360;
-            }
-            else if (state == GLFW_RELEASE){
-                glfwDisable( GLFW_KEY_REPEAT);
-            }
-            break;
-
-        case GLFW_KEY_RIGHT:
-            if (state == GLFW_PRESS){
-                glfwEnable( GLFW_KEY_REPEAT);
-                alpha += STEP;
-                alpha %= 360;
-            }
-            else if (state == GLFW_RELEASE){
-                glfwDisable( GLFW_KEY_REPEAT);
-            }
-            break;
+void modifyPOV(){
+    if (glfwGetKey(GLFW_KEY_UP) == GLFW_PRESS){
+        beta -= STEP;
+        if ( (fabs(beta - CIRCLE) < EPS) || (fabs(beta + CIRCLE) < EPS) ){
+            beta = 0;
+        }
+        if  ( (fabs(beta + HALF_CIRCLE) < EPS) || (fabs(beta - HALF_CIRCLE) < EPS) || (fabs(beta) < EPS) ){
+            (rotationView == 0) ? (rotationView=HALF_CIRCLE) : (rotationView=0);
+            //{ std::cout<<"rotation:"<<std::endl;}
+            beta -= STEP;
+        }
+    }
+    if (glfwGetKey(GLFW_KEY_DOWN) == GLFW_PRESS){
+        beta += STEP;
+        if ( (fabs(beta - CIRCLE) < EPS) || (fabs(beta + CIRCLE) < EPS) ){
+            beta = 0;
+        }
+        if ( (fabs(beta - HALF_CIRCLE) < EPS) || (fabs(beta + HALF_CIRCLE) < EPS) || (fabs(beta) < EPS) ){
+            (rotationView == 0) ? (rotationView=HALF_CIRCLE) : (rotationView=0);
+            //{ std::cout<<"rotation:"<<std::endl;}
+            beta += STEP;
+        }
 
     }
+    if (glfwGetKey(GLFW_KEY_LEFT) == GLFW_PRESS){
+        alpha -= STEP;
+        if ( (fabs(alpha - CIRCLE) < EPS) || (fabs(alpha + CIRCLE) < EPS) ){
+            alpha = 0;
+        }
+    }
+    if (glfwGetKey(GLFW_KEY_RIGHT) == GLFW_PRESS){
+        alpha += STEP;
+        if ( (fabs(alpha - CIRCLE) < EPS) || (fabs(alpha + CIRCLE) < EPS) ){
+            alpha = 0;
+        }
+    }
+}
 
 
+
+void draw_example_cube (float length = 1,float Cx = 0 , float Cy = 0, float Cz = 0){
+
+
+          float halfLength = length/2 ;
+          glBegin( GL_TRIANGLES );
+          //yellow right
+          glColor3f(1.0f, 1.0f, 0.0f );
+
+          glVertex3f(Cx+halfLength, Cy+halfLength, Cz+halfLength);
+          glVertex3f(Cx+halfLength, Cy+halfLength, Cz-halfLength);
+          glVertex3f(Cx-halfLength, Cy+halfLength, Cz-halfLength);
+
+          glVertex3f(Cx-halfLength, Cy+halfLength, Cz-halfLength);
+          glVertex3f(Cx-halfLength, Cy+halfLength, Cz+halfLength);
+          glVertex3f(Cx+halfLength, Cy+halfLength, Cz+halfLength);
+          glEnd();
+
+          //green left
+          glBegin( GL_TRIANGLES );
+          glColor3f(0.0f, 1.0f, 0.0f );
+
+          glVertex3f(Cx+halfLength, Cy-halfLength, Cz+halfLength);
+          glVertex3f(Cx+halfLength, Cy-halfLength, Cz-halfLength);
+          glVertex3f(Cx-halfLength, Cy-halfLength, Cz-halfLength);
+
+          glVertex3f(Cx-halfLength, Cy-halfLength, Cz-halfLength);
+          glVertex3f(Cx-halfLength, Cy-halfLength, Cz+halfLength);
+          glVertex3f(Cx+halfLength, Cy-halfLength, Cz+halfLength);
+          glEnd();
+
+          //white front
+
+          glBegin( GL_TRIANGLES );
+          glColor3f(1.0f, 1.0f, 1.0f );
+
+          glVertex3f(Cx+halfLength, Cy-halfLength, Cz+halfLength);
+          glVertex3f(Cx+halfLength, Cy-halfLength, Cz-halfLength);
+          glVertex3f(Cx+halfLength, Cy+halfLength, Cz-halfLength);
+
+          glVertex3f(Cx+halfLength, Cy+halfLength, Cz-halfLength);
+          glVertex3f(Cx+halfLength, Cy+halfLength, Cz+halfLength);
+          glVertex3f(Cx+halfLength, Cy-halfLength, Cz+halfLength);
+          glEnd();
+
+          //back orange
+          glBegin( GL_TRIANGLES );
+          glColor3f(0.9f, 0.4f, 0.0f );
+
+          glVertex3f(Cx-halfLength, Cy+-halfLength, Cz+halfLength);
+          glVertex3f(Cx-halfLength, Cy-halfLength, Cz-halfLength);
+          glVertex3f(Cx-halfLength, Cy+halfLength, Cz-halfLength);
+
+          glVertex3f(Cx-halfLength, Cy+halfLength, Cz-halfLength);
+          glVertex3f(Cx-halfLength, Cy+halfLength, Cz+halfLength);
+          glVertex3f(Cx-halfLength, Cy-halfLength, Cz+halfLength);
+          glEnd();
+
+          //red bottom
+          glBegin( GL_TRIANGLES );
+          glColor3f(1.0f, 0.0f, 0.0f );
+
+          glVertex3f(Cx+halfLength, Cy-halfLength, Cz-halfLength);
+          glVertex3f(Cx-halfLength, Cy-halfLength, Cz-halfLength);
+          glVertex3f(Cx-halfLength, Cy+halfLength, Cz-halfLength);
+
+          glVertex3f(Cx-halfLength, Cy+halfLength, Cz-halfLength);
+          glVertex3f(Cx+halfLength, Cy+halfLength, Cz-halfLength);
+          glVertex3f(Cx+halfLength, Cy-halfLength, Cz-halfLength);
+          glEnd();
+
+          //blue top
+          glBegin( GL_TRIANGLES );
+          glColor3f(0.0f, 0.0f, 1.0f );
+
+          glVertex3f(Cx+halfLength, Cy-halfLength, Cz+halfLength);
+          glVertex3f(Cx-halfLength, Cy-halfLength, Cz+halfLength);
+          glVertex3f(Cx-halfLength, Cy+halfLength, Cz+halfLength);
+
+          glVertex3f(Cx-halfLength, Cy+halfLength, Cz+halfLength);
+          glVertex3f(Cx+halfLength, Cy+halfLength, Cz+halfLength);
+          glVertex3f(Cx+halfLength, Cy-halfLength, Cz+halfLength);
+          glEnd();
 }
 
 void Cube::draw(int length, float Cx , float Cy , float Cz){
@@ -121,15 +185,11 @@ void Cube::draw(int length, float Cx , float Cy , float Cz){
 
     glfwInit();
 
-
-
     if( !glfwOpenWindow( 300, 300, 0, 0, 0, 0, 0, 0, GLFW_WINDOW ) )
     {
         glfwTerminate();
         return;
     }
-
-
 
     glEnable(GL_DEPTH_TEST);
     glfwSetWindowTitle("In the beginning");
@@ -137,7 +197,6 @@ void Cube::draw(int length, float Cx , float Cy , float Cz){
     glfwSetWindowSize(512,512);
 
     glfwSetMouseWheelCallback( scrollFunction );
-    glfwSetKeyCallback( mover );
 
     while(running)
     {
@@ -158,107 +217,24 @@ void Cube::draw(int length, float Cx , float Cy , float Cz){
         glMatrixMode( GL_MODELVIEW );//
         glLoadIdentity();//
 
-        float alphaRads = ( static_cast<float> (alpha) /180) * PI;
-        float betaRads = ( static_cast<float> (beta) /180) * PI;
+        double alphaRads = ( static_cast<double> (alpha) /180) * PI;
+        double betaRads = ( static_cast<double> (beta) /180) * PI;
 
-        //used so that the vector representing the position of the eye does never match the vector representing the upside of the scene
-        // see gluLookAt specification for more details;
-        float error = 0.0001;
-        static_cast <void> (error); //this should be added to X and Y to prevent the forespoken problem, since it is not possible for the
-        // beta angle to become a multiple of 2*PI this problem is considered solved, yet if refactoring is requirred, this
-        // variable stands as a reminder. it has been cast to void so as to not trigger compiler warnings and to tell the
-        //reader of the code that it is not used
-
-        float X = R*cos(alphaRads)*sin(betaRads)+Cx;
-        float Y = R*sin(alphaRads)*sin(betaRads)+Cy;
-        float Z = R*cos(betaRads)+Cz;
+        double X = R*cos(alphaRads)*sin(betaRads)+Cx;
+        double Y = R*sin(alphaRads)*sin(betaRads)+Cy;
+        double Z = R*cos(betaRads)+Cz;
 
 
-        glRotatef(rot, 0.0f, 0.0f, 1.0f);
+        glRotatef(rotationView, 0.0f, 0.0f, 1.0f);
 
-        std::cout<<alpha<<" "<<beta<<std::endl;
+        //std::cout<<alpha<<" "<<beta<<std::endl;
 
         gluLookAt(X, Y, Z,
                 Cx, Cy, Cz,
                 0.0f, 0.0f, 1 );
+        draw_example_cube(length,Cx,Cy,Cz);
 
-
-
-        glBegin( GL_TRIANGLES );
-
-          //yellow right
-          glColor3f(1.0f, 1.0f, 0.0f );
-
-          glVertex3f(Cx+1.0f, Cy+1.0f, Cz+1.0f);
-          glVertex3f(Cx+1.0f, Cy+1.0f, Cz-1.0f);
-          glVertex3f(Cx-1.0f, Cy+1.0f, Cz-1.0f);
-
-          glVertex3f(Cx-1.0f, Cy+1.0f, Cz-1.0f);
-          glVertex3f(Cx-1.0f, Cy+1.0f, Cz+1.0f);
-          glVertex3f(Cx+1.0f, Cy+1.0f, Cz+1.0f);
-
-
-          //green left
-          glColor3f(0.0f, 1.0f, 0.0f );
-
-          glVertex3f(Cx+1.0f, Cy-1.0f, Cz+1.0f);
-          glVertex3f(Cx+1.0f, Cy-1.0f, Cz-1.0f);
-          glVertex3f(Cx-1.0f, Cy-1.0f, Cz-1.0f);
-
-          glVertex3f(Cx-1.0f, Cy-1.0f, Cz-1.0f);
-          glVertex3f(Cx-1.0f, Cy-1.0f, Cz+1.0f);
-          glVertex3f(Cx+1.0f, Cy-1.0f, Cz+1.0f);
-
-
-          //white front
-          glColor3f(1.0f, 1.0f, 1.0f );
-
-          glVertex3f(Cx+1.0f, Cy-1.0f, Cz+1.0f);
-          glVertex3f(Cx+1.0f, Cy-1.0f, Cz-1.0f);
-          glVertex3f(Cx+1.0f, Cy+1.0f, Cz-1.0f);
-
-          glVertex3f(Cx+1.0f, Cy+1.0f, Cz-1.0f);
-          glVertex3f(Cx+1.0f, Cy+1.0f, Cz+1.0f);
-          glVertex3f(Cx+1.0f, Cy-1.0f, Cz+1.0f);
-
-
-          //back orange
-          glColor3f(0.9f, 0.4f, 0.0f );
-
-          glVertex3f(Cx-1.0f, Cy+-1.0f, Cz+1.0f);
-          glVertex3f(Cx-1.0f, Cy-1.0f, Cz-1.0f);
-          glVertex3f(Cx-1.0f, Cy+1.0f, Cz-1.0f);
-
-          glVertex3f(Cx-1.0f, Cy+1.0f, Cz-1.0f);
-          glVertex3f(Cx-1.0f, Cy+1.0f, Cz+1.0f);
-          glVertex3f(Cx-1.0f, Cy-1.0f, Cz+1.0f);
-
-
-          //red bottom
-          glColor3f(1.0f, 0.0f, 0.0f );
-
-          glVertex3f(Cx+1.0f, Cy-1.0f, Cz-1.0f);
-          glVertex3f(Cx-1.0f, Cy-1.0f, Cz-1.0f);
-          glVertex3f(Cx-1.0f, Cy+1.0f, Cz-1.0f);
-
-          glVertex3f(Cx-1.0f, Cy+1.0f, Cz-1.0f);
-          glVertex3f(Cx+1.0f, Cy+1.0f, Cz-1.0f);
-          glVertex3f(Cx+1.0f, Cy-1.0f, Cz-1.0f);
-
-
-          //blue top
-          glColor3f(0.0f, 0.0f, 1.0f );
-
-          glVertex3f(Cx+1.0f, Cy-1.0f, Cz+1.0f);
-          glVertex3f(Cx-1.0f, Cy-1.0f, Cz+1.0f);
-          glVertex3f(Cx-1.0f, Cy+1.0f, Cz+1.0f);
-
-          glVertex3f(Cx-1.0f, Cy+1.0f, Cz+1.0f);
-          glVertex3f(Cx+1.0f, Cy+1.0f, Cz+1.0f);
-          glVertex3f(Cx+1.0f, Cy-1.0f, Cz+1.0f);
-
-        glEnd();
-
+        modifyPOV();
 
         glfwSwapBuffers();
 

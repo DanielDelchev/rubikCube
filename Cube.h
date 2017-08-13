@@ -3,6 +3,7 @@
 
 #include "CubeSide.h"
 #include <stack>
+#include <atomic>
 
 enum class Mode:int{
     BOTTOM_TO_TOP = 0,
@@ -38,7 +39,7 @@ class Cube{
 public:
 
 
-    Cube(int _sclale = 3, Mode _mode = Mode::BOTTOM_TO_TOP, int _choice = -1);
+    Cube(int _rows = 3, Mode _mode = Mode::BOTTOM_TO_TOP, int _choice = -1);
     Cube(const Cube &given);
     Cube& operator=(const Cube &given);
 
@@ -47,7 +48,7 @@ public:
 
     virtual ~Cube();
 
-    inline int getScaling()const{return scaling;}
+    inline int getRows()const{return rows;}
 
     inline bool getState()const{ //true if all sides are solved
         bool solved = true;
@@ -57,8 +58,7 @@ public:
         return solved;
     }
 
-    inline int getChoice()const{return choice;}
-    inline Mode getMode()const{return mode;}
+
     inline const CubeSide * getCubeSide()const{return cubeSide;}
     inline CubeSide *getCubeSide(){return cubeSide;}
     inline const std::stack<Turn>& getHistory()const{return history;}
@@ -72,13 +72,11 @@ public:
     void print(); //for debugging purposes
     void solve(); //apply all turns in history in reverse direction
 
-    inline void setMode(Mode _mode){
-        mode = _mode;
-    }
+    int getChoice()const{return choice.load();}
+    Mode getMode()const{return mode.load();}
+    void setChoice(int _choice){return choice.store(_choice);}
+    void setMode(Mode _mode){return mode.store(_mode);}
 
-    inline void setChoice(int _choice){
-        choice = _choice;
-    }
 
     void randomize(int count = 16);
 
@@ -90,10 +88,11 @@ private:
     void copy(const Cube& given);
     void destroy();
 
+    std::atomic<Mode> mode; //how the cube will be drawn (segmented for rotation)
+    std::atomic<int> choice; //which row of subcubes is currently considered for rotation [0 ; wall_dimention]
+
     static const int SIDES_COUNT = 6;
-    int scaling; // regarding drawing sizes
-    Mode mode; //how the cube will be drawn (segmented for rotation)
-    int choice; //which row of subcubes is currently considered for rotation [0 ; wall_dimention]
+    int rows; // regarding drawing sizes
     CubeSide cubeSide [SIDES_COUNT];
     std::stack<Turn> history;
 };

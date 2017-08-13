@@ -2,14 +2,16 @@
 #include <iostream>
 #include "UnitTest++.h"
 
+
+
 int main()
 {
 
     Cube T = Cube();
-//    T.print();
+    T.setChoice(0);
     T.draw(2,0,0,0);
 
-    return UnitTest::RunAllTests();
+    return 0;//UnitTest::RunAllTests();
 
 /*
  Cube T;

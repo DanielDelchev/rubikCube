@@ -3,21 +3,19 @@
 #include <iostream>
 #include <memory>
 
+
 //currently hollow, since no allocation on the heal is performed
 void Cube::destroy(){}
 Cube::~Cube(){destroy();}
 
-Cube::Cube(int _scaling, Mode _mode, int _choice):scaling(_scaling),mode(_mode),choice(_choice){
+Cube::Cube(int _rows, Mode _mode, int _choice):mode(_mode),choice(_choice),rows(_rows){
     for (int i=0;i<SIDES_COUNT;i++){
-        getCubeSide()[i].paint(static_cast<Color> (i));
-
+        getCubeSide()[i] = CubeSide(rows ,static_cast<Color> (i));
     }
 }
 
 void Cube::copy(const Cube &given){
-    scaling = given.getScaling();
-    mode = given.getMode();
-    choice = given.getChoice();
+    rows = given.getRows();
     for (int i=0;i<SIDES_COUNT;i++){
         cubeSide[i] = given.getCubeSide()[i];
     }
@@ -76,7 +74,7 @@ void Cube::turn(Direction dir){
     //aquire lock?
 
     (dir == Direction::CLOCK_WISE) ? turnClockwise() : turnCounterClockwise();
-    history.push(Turn(getMode(),getChoice(),Direction::CLOCK_WISE));
+    history.push(Turn(getMode(),getChoice(),dir));
 
 
     // release lock or await end of animation?
@@ -84,7 +82,7 @@ void Cube::turn(Direction dir){
 
 void Cube::turnClockwise(){
 
-    const int rows = getCubeSide()[0].getDimention();
+    const int rowsCount = getCubeSide()[0].getDimention();
     std::unique_ptr<Color[]> buffer (new Color[rows]);
 
     const int SIDES_TO_TURN = 4;
@@ -100,7 +98,7 @@ void Cube::turnClockwise(){
 
         case Mode::BOTTOM_TO_TOP:
 
-            for (int j=0;j<rows;j++){
+            for (int j=0;j<rowsCount;j++){
 
                 int currentChoice = getChoice();
 
@@ -121,11 +119,11 @@ void Cube::turnClockwise(){
             }
 
 
-            if ( choice == 0 ){
+            if ( getChoice() == 0 ){
                 getCubeSide()[static_cast <int> (Side::TOP)].transponate();
                 getCubeSide()[static_cast <int> (Side::TOP)].reverseRows();
             }
-            else if (choice == (rows-1)){
+            else if ( getChoice() == (rowsCount-1)){
                 getCubeSide()[static_cast <int> (Side::BOTTOM)].transponate();
                 getCubeSide()[static_cast <int> (Side::BOTTOM)].reverseRows();
             }
@@ -136,14 +134,14 @@ void Cube::turnClockwise(){
 
         case Mode::LEFT_TO_RIGHT:
             //swap rows of affected walls accordingly
-            if ( choice == 0 || choice == (rows-1) ){
+            if ( getChoice() == 0 || getChoice() == (rowsCount-1) ){
                 //trnasponate wall
             }
             break;
 
         case Mode::FRONT_TO_BACK:
             //swap rows of affected walls accordingly
-            if ( choice == 0 || choice == (rows-1) ){
+            if ( getChoice() == 0 || getChoice() == (rowsCount-1) ){
                 //trnasponate wall
             }
             break;
@@ -155,7 +153,7 @@ void Cube::turnClockwise(){
 
 void Cube::turnCounterClockwise(){
 
-    const int rows = getCubeSide()[0].getDimention();
+    const int rowsCount = getCubeSide()[0].getDimention();
     std::unique_ptr<Color[]> buffer (new Color[rows]);
 
     const int SIDES_TO_TURN = 4;
@@ -171,7 +169,7 @@ void Cube::turnCounterClockwise(){
 
         case Mode::BOTTOM_TO_TOP:
 
-            for (int j=0;j<rows;j++){
+            for (int j=0;j<rowsCount;j++){
 
                 int currentChoice = getChoice();
 
@@ -192,12 +190,12 @@ void Cube::turnCounterClockwise(){
             }
 
 
-            if ( choice == 0 ){
+            if ( getChoice() == 0 ){
                 getCubeSide()[static_cast <int> (Side::TOP)].transponate();
                 getCubeSide()[static_cast <int> (Side::TOP)].reverseColumns();
             }
 
-            else if ( choice == rows-1 ){
+            else if ( getChoice() == rowsCount-1 ){
                 getCubeSide()[static_cast <int> (Side::BOTTOM)].transponate();
                 getCubeSide()[static_cast <int> (Side::BOTTOM)].reverseColumns();
             }
@@ -205,14 +203,14 @@ void Cube::turnCounterClockwise(){
 
         case Mode::LEFT_TO_RIGHT:
             //swap rows of affected walls accordingly
-            if ( choice == 0 || choice == (rows-1) ){
+            if ( getChoice() == 0 || getChoice() == (rowsCount-1) ){
                 //trnasponate wall
             }
             break;
 
         case Mode::FRONT_TO_BACK:
             //swap rows of affected walls accordingly
-            if ( choice == 0 || choice == (rows-1) ){
+            if ( getChoice() == 0 || getChoice() == (rowsCount-1) ){
                 //trnasponate wall
             }
             break;
@@ -229,16 +227,4 @@ bool Cube::operator==(const Cube &given)const{
     }
     return result;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 

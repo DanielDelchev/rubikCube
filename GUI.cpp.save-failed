@@ -4,11 +4,26 @@
 #include <cmath>
 #include <thread>
 #include <mutex>
-#include <condition_variable>
+
+/**@TODO
+    *revise how lighting vector works so as to figure out how to make the chosen row paler
+    *finish unit tests
+    *start gui implementation of Cube
+    *DO NOT FORGET THAT THERE IS ROTATING IN THE VIEW POINT KEY CALLBACK WHICH MIGHT CAUSE PROBLEMS LATER
+    *ALTHOUGH IF IT THE CALLBACK GETS LOCKED/DISABLED WHILE SPINNINNG ANIMATION OCCURS, THERE OUGHT NOT BE A PROBLEM
+    *POSSIBLY AWAIT WILL BE USED BY THE OOP TURN FUNCTION WAITING FOR THE GUI TURN TO END ?
+
+    also spinning could use more testing to check if some combinations of alpha+beta changes cause abnormalities in the GUI
+    this could be testet later on by beta testers ?
+
+*/
+
+//callback function for mouse scroll motion is of type : void (*) (int)
+//so these following arguments are global, they are also static, so thy would not be
+//used when linking
+
 
 #define PI 3.14
-
-static Cube *callbackPtrCube = nullptr;
 
 
 // file local variables and constants
@@ -21,14 +36,8 @@ static int lastScrollPosition = 0;
 static const int HALF_CIRCLE = 180;
 static const int CIRCLE = 360;
 static int upside = 1;
-std::mutex cubeAccess;
-std::thread backendTurn;
 
-std::mutex boolean;
-bool turning = false;
-std::condition_variable cv;
-
-static void scrollFunction (int scrollPosition){
+void scrollFunction (int scrollPosition){
         const int LIMIT = 10;
         float step = 0.2f;
         if (lastScrollPosition>scrollPosition && R <=LIMIT){
@@ -40,75 +49,7 @@ static void scrollFunction (int scrollPosition){
         lastScrollPosition = scrollPosition;
 }
 
-
-static void choiceReduce(){
-    int rowsCount = callbackPtrCube->getRows();
-    int current = callbackPtrCube->getChoice();
-    if (current == 0){
-        callbackPtrCube->setChoice(-1);
-    }
-    else if (current == -1){
-        callbackPtrCube->setChoice(rowsCount-1);
-    }
-    else{
-        callbackPtrCube->setChoice( (current-1) % rowsCount) ;
-    }
-    std::cout<<callbackPtrCube->getChoice()<<std::endl;
-}
-
-static void choiceIncrease(){
-    int rowsCount = callbackPtrCube->getRows();
-    int current = callbackPtrCube->getChoice();
-    if (current == rowsCount-1){
-        callbackPtrCube->setChoice(-1);
-    }
-    else if (current == -1){
-        callbackPtrCube->setChoice(0);
-    }
-    else{
-        callbackPtrCube->setChoice( (current+1) % rowsCount) ;
-    }
-    std::cout<<callbackPtrCube->getChoice()<<std::endl;
-}
-
-static void modeAndChoiceCb(int buttonID, int state){
-
-    glfwDisable(GLFW_KEY_REPEAT);
-
-    boolean.lock();
-    if (!turning && state == GLFW_PRESS && buttonID == GLFW_KEY_SPACE){
-        Mode current = callbackPtrCube->getMode();
-        const int modesCount = 3;
-        callbackPtrCube->setMode( static_cast<Mode>((static_cast<int>(current)+1)%modesCount) );
-        std::cout<<static_cast<int> (callbackPtrCube->getMode())<<std::endl;
-    }
-    boolean.unlock();
-
-
-    boolean.lock();
-    if (!turning && state == GLFW_PRESS && buttonID == GLFW_KEY_RALT){
-        if (upside == 1){
-            choiceIncrease();
-        }
-        else {
-            choiceReduce();
-        }
-    }
-    boolean.unlock();
-
-    boolean.lock();
-    if (!turning && state == GLFW_PRESS && buttonID == GLFW_KEY_LALT){
-        if (upside == 1){
-            choiceReduce();
-        }
-        else {
-            choiceIncrease();
-        }
-    }
-    boolean.unlock();
-}
-
-static void modifyPOV(){
+void modifyPOV(){
     if (glfwGetKey(GLFW_KEY_UP) == GLFW_PRESS){
         beta -= STEP;
         if ( (fabs(beta - CIRCLE) < EPS) || (fabs(beta + CIRCLE) < EPS) ){
@@ -231,45 +172,7 @@ void draw_example_cube (float length = 1,float Cx = 0 , float Cy = 0, float Cz =
 }
 
 
-
-
-static void turnOOP(Cube * const cube,Direction dir){
-    std::unique_lock<std::mutex> lck(boolean);
-    while (turning) {
-        cv.wait(lck);
-        if (!turning){
-            cubeAccess.lock();
-            cube->turn(dir);
-            cube->print(); //debugging
-            cubeAccess.unlock();
-        }
-    }
-}
-
-static void checkTurn(Cube * const cube){
-    Direction dir;
-    boolean.lock();
-    if (glfwGetKey(GLFW_KEY_RCTRL)==GLFW_PRESS && !backendTurn.joinable() && !turning && cube->getChoice()>=0){
-        turning = true;
-        (upside==1) ? (dir = Direction::CLOCK_WISE) : (dir = Direction::COUNTER_CLOCK_WISE);
-        backendTurn = std::thread(turnOOP,cube,dir);
-        backendTurn.detach();
-    }
-
-    else if (glfwGetKey(GLFW_KEY_LCTRL)==GLFW_PRESS && !backendTurn.joinable() && !turning && cube->getChoice()>=0){
-        turning = true;
-        (upside==1) ? (dir = Direction::COUNTER_CLOCK_WISE) : (dir = Direction::CLOCK_WISE);
-        backendTurn = std::thread(turnOOP,cube,dir);
-        backendTurn.detach();
-    }
-
-    boolean.unlock();
-}
-
-void Cube::draw(int length, float Cx , float Cy , float Cz){
-
-    callbackPtrCube = this;
-
+void gui (int length, float Cx , float Cy , float Cz){
     int     width, height;
     int     frame = 0;
     bool    running = true;
@@ -288,7 +191,6 @@ void Cube::draw(int length, float Cx , float Cy , float Cz){
     glfwSetWindowSize(512,512);
 
     glfwSetMouseWheelCallback( scrollFunction );
-    glfwSetKeyCallback( modeAndChoiceCb );
 
     while(running)
     {
@@ -321,25 +223,9 @@ void Cube::draw(int length, float Cx , float Cy , float Cz){
         gluLookAt(X, Y, Z,
                 Cx, Cy, Cz,
                 0.0f, 0.0f, upside );
-
-
-        checkTurn(this);
-
-        cubeAccess.lock();
         draw_example_cube(length,Cx,Cy,Cz);
-        cubeAccess.unlock();
 
         modifyPOV();
-
-
-
-        if (glfwGetKey(GLFW_KEY_F10)==GLFW_PRESS){ //if not turning anymore
-            boolean.lock();
-            turning = false;
-            boolean.unlock();
-            cv.notify_one();
-        }
-
 
         glfwSwapBuffers();
 
@@ -351,3 +237,16 @@ void Cube::draw(int length, float Cx , float Cy , float Cz){
     glfwTerminate();
 
 }
+
+void oopChangeListener(const *Cube cube){
+
+}
+
+
+void Cube::draw(int length, float Cx , float Cy , float Cz){
+    std::thread graphics (gui,length,Cx,Cy,Cz);
+    std::thread changes (oopChangeListener,this);
+    graphics.join();
+    oopChangeListener.join();
+}
+

@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1502636726 source:c:\users\nooby\desktop\code_blocks_projects\rubik\main.cpp
+1506441986 source:c:\users\nooby\desktop\code_blocks_projects\rubik\main.cpp
 	"Cube.h"
 	<iostream>
 	"UnitTest++.h"
@@ -10,7 +10,7 @@
 	<GL/gl.h>
 	<GL/glu.h>
 
-1502632999 c:\users\nooby\desktop\code_blocks_projects\rubik\cube.h
+1506448846 c:\users\nooby\desktop\code_blocks_projects\rubik\cube.h
 	"CubeSide.h"
 	<stack>
 	<atomic>
@@ -22,17 +22,17 @@
 	<string.h>
 	<iostream>
 
-1502633956 source:c:\users\nooby\desktop\code_blocks_projects\rubik\cube.cpp
+1506448874 source:c:\users\nooby\desktop\code_blocks_projects\rubik\cube.cpp
 	"Cube.h"
 	<GL/glfw.h>
 	<iostream>
-	<memory>
 
-1502629273 source:c:\users\nooby\desktop\code_blocks_projects\rubik\unittests.cpp
+1506450269 source:c:\users\nooby\desktop\code_blocks_projects\rubik\unittests.cpp
 	"Cube.h"
 	"UnitTest++.h"
+	<iostream>
 
-1502637158 source:c:\users\nooby\desktop\code_blocks_projects\rubik\gui.cpp
+1506456661 source:c:\users\nooby\desktop\code_blocks_projects\rubik\gui.cpp
 	"Cube.h"
 	<GL/glfw.h>
 	<iostream>

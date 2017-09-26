@@ -6,10 +6,9 @@
 #include <atomic>
 
 enum class Mode:int{
-    BOTTOM_TO_TOP = 0,
+    TOP_TO_BOTTOM = 0,
     LEFT_TO_RIGHT = 1,
     FRONT_TO_BACK = 2,
-
 };
 
 enum class Side:int{
@@ -22,8 +21,9 @@ enum class Side:int{
 };
 
 enum class Direction:int{
-    CLOCK_WISE = 0,
-    COUNTER_CLOCK_WISE = 1,
+    NEUTRAL = 0,
+    CLOCK_WISE = 1,
+    COUNTER_CLOCK_WISE = -1,
 };
 
 struct Turn{
@@ -38,14 +38,16 @@ class Cube{
 
 public:
 
+    static Cube& instance(int _rows = 3, Mode _mode = Mode::TOP_TO_BOTTOM, int _choice = -1)
+    {
+        static Cube singleton(_rows, Mode::TOP_TO_BOTTOM, _choice);
+        return singleton;
+    }
 
-    Cube(int _rows = 3, Mode _mode = Mode::BOTTOM_TO_TOP, int _choice = -1);
-    Cube(const Cube &given);
-    Cube& operator=(const Cube &given);
-
-    Cube(Cube &&given) = default;
-    Cube& operator=(Cube &&given) = default ;
-
+    Cube(const Cube &given) = delete;
+    Cube& operator=(const Cube &given) = delete;
+    Cube(Cube &&given) = delete;
+    Cube& operator=(Cube &&given) = delete;
     virtual ~Cube();
 
     inline int getRows()const{return rows;}
@@ -65,33 +67,41 @@ public:
     inline std::stack<Turn>& getHistory(){return history;}
 
 
-    bool operator== (const Cube &given)const;
 
-    void draw(int length,float Cx = 0, float Cy = 0, float Cz = 0);
-    void turn(Direction dir);
+    void draw(int length = 5,float Cx = 0, float Cy = 0, float Cz = 0);
+    void turn();
     void print(); //for debugging purposes
     void solve(); //apply all turns in history in reverse direction
 
-    int getChoice()const{return choice.load();}
-    Mode getMode()const{return mode.load();}
-    void setChoice(int _choice){return choice.store(_choice);}
-    void setMode(Mode _mode){return mode.store(_mode);}
+    inline int getChoice()const{return choice.load();}
+    inline Mode getMode()const{return mode.load();}
+    inline void setChoice(int _choice){return choice.store(_choice);}
+    inline void setMode(Mode _mode){return mode.store(_mode);}
+    inline Direction getDir()const{return dir.load();}
+    inline void setDir(Direction _dir){return dir.store(_dir);}
+    void choiceIncrease();
+    void choiceDecrease();
+    void modeIncrease();
 
 
     void randomize(int count = 16);
 
+    static const int SIDES_COUNT = 6;
+
 private:
+
+    Cube(int _rows = 3, Mode _mode = Mode::TOP_TO_BOTTOM, int _choice = -1);
 
     void turnClockwise();
     void turnCounterClockwise();
+    void drawCube(int turningDegrees, float length, float Cx, float Cy, float Cz)const;
 
-    void copy(const Cube& given);
     void destroy();
 
     std::atomic<Mode> mode; //how the cube will be drawn (segmented for rotation)
     std::atomic<int> choice; //which row of subcubes is currently considered for rotation [0 ; wall_dimention]
+    std::atomic<Direction> dir; //which row of subcubes is currently considered for rotation [0 ; wall_dimention]
 
-    static const int SIDES_COUNT = 6;
     int rows; // regarding drawing sizes
     CubeSide cubeSide [SIDES_COUNT];
     std::stack<Turn> history;

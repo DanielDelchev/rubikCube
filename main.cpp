@@ -7,11 +7,13 @@
 int main()
 {
 
-    Cube T = Cube();
-    T.setChoice(0);
-    T.draw(2,0,0,0);
+    Cube& cb =  Cube::instance();
+    cb.draw(30,0.100,-100,10000);
+    #ifdef UNITTESTPP_H
+        return UnitTest::RunAllTests();
+    #endif
+    return 0;
 
-    return 0;//UnitTest::RunAllTests();
 
 /*
  Cube T;

@@ -1,4 +1,5 @@
 #include "Cube.h"
+#include "Utilities.h"
 #include <GL/glfw.h>
 #include <iostream>
 #include <cmath>

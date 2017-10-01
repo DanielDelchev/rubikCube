@@ -79,7 +79,7 @@ struct Fixture
     }
 
     const int rows = 3;
-    Cube& myCube = Cube::instance(rows,Mode::TOP_TO_BOTTOM,-1);
+    Cube& myCube = Cube::instance(rows,Mode::TOP_TO_BOTTOM,-1,5);
 };
 
 
@@ -994,7 +994,7 @@ TEST_FIXTURE(Fixture, LeftToRightCounterClockwise2){
     front = myCube.getCubeSide()[static_cast<int> (Side::FRONT)];
     back = myCube.getCubeSide()[static_cast<int> (Side::BACK)];
 
-    //myCube.turn(Direction::COUNTER_CLOCK_WISE);
+    //fmyCube.turn(Direction::COUNTER_CLOCK_WISE);
     myCube.setDir(Direction::COUNTER_CLOCK_WISE);
     myCube.turn();
 

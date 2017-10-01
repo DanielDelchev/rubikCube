@@ -165,12 +165,8 @@ static void checkTurn(Cube * const cube){
     boolean.unlock();
 }
 
-void Cube::draw(int length, float Cx , float Cy , float Cz){
+void Cube::draw(float Cx , float Cy , float Cz){
 
-    float eps = 0.001;
-    if ( (length-3) < eps || (length-30) > eps ){
-        length = 5;
-    }
     callbackPtrCube = this;
     R = (length/2)*5;
     limitR = 2*R;
@@ -246,11 +242,14 @@ void Cube::draw(int length, float Cx , float Cy , float Cz){
 
         boolean.lock();
         if(turning){
-            glRotatef(turningDegrees,Cx+1,Cy+0,Cz+0);
+                // a za drugite vyrteneta?s
+            if (getMode()==Mode::TOP_TO_BOTTOM)
+                glRotatef(turningDegrees,Cx+0,Cy+0,Cz+0);
+
         }
         boolean.unlock();
 
-        drawCube(turningDegrees,length, Cx, Cy, Cz);
+        drawCube(turningDegrees, Cx, Cy, Cz);
 
         glPopMatrix();
 
@@ -398,7 +397,7 @@ void draw_example_cube (float length, float Cx, float Cy, float Cz){
           //glEnable(GL_LIGHTING);
 }
 
-void Cube::drawCube(int turningDegrees, float length, float Cx, float Cy, float Cz)const{
+void Cube::drawCube(int turningDegrees, float Cx, float Cy, float Cz)const{
 
     switch (getMode()){
         case Mode::TOP_TO_BOTTOM: break;

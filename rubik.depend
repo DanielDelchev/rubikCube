@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1506441986 source:c:\users\nooby\desktop\code_blocks_projects\rubik\main.cpp
+1506853389 source:c:\users\nooby\desktop\code_blocks_projects\rubik\main.cpp
 	"Cube.h"
 	<iostream>
 	"UnitTest++.h"
@@ -10,7 +10,7 @@
 	<GL/gl.h>
 	<GL/glu.h>
 
-1506448846 c:\users\nooby\desktop\code_blocks_projects\rubik\cube.h
+1506854031 c:\users\nooby\desktop\code_blocks_projects\rubik\cube.h
 	"CubeSide.h"
 	<stack>
 	<atomic>
@@ -22,22 +22,29 @@
 	<string.h>
 	<iostream>
 
-1506448874 source:c:\users\nooby\desktop\code_blocks_projects\rubik\cube.cpp
+1506852799 source:c:\users\nooby\desktop\code_blocks_projects\rubik\cube.cpp
 	"Cube.h"
 	<GL/glfw.h>
 	<iostream>
 
-1506450269 source:c:\users\nooby\desktop\code_blocks_projects\rubik\unittests.cpp
+1506851440 source:c:\users\nooby\desktop\code_blocks_projects\rubik\unittests.cpp
 	"Cube.h"
 	"UnitTest++.h"
 	<iostream>
 
-1506456661 source:c:\users\nooby\desktop\code_blocks_projects\rubik\gui.cpp
+1506853702 source:c:\users\nooby\desktop\code_blocks_projects\rubik\gui.cpp
 	"Cube.h"
+	"Utilities.h"
 	<GL/glfw.h>
 	<iostream>
 	<cmath>
 	<thread>
 	<mutex>
 	<condition_variable>
+
+1506539287 source:c:\users\nooby\desktop\code_blocks_projects\rubik\utilities.cpp
+	"Utilities.h"
+
+1506539242 c:\users\nooby\desktop\code_blocks_projects\rubik\utilities.h
+	<GL/glfw.h>
 

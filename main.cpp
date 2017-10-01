@@ -7,8 +7,16 @@
 int main()
 {
 
-    Cube& cb =  Cube::instance();
-    cb.draw(30,0.100,-100,10000);
+
+    // unittests are designed for 3x3x3 cube, and will crash with segmentation fault for other dimentions of the cube
+    #ifndef UNITTESTPP_H
+        Cube& cb =  Cube::instance(8,Mode::TOP_TO_BOTTOM,-1,27);
+    #else
+        Cube& cb =  Cube::instance();
+    #endif
+
+    cb.draw(0.100,-100,10000);
+
     #ifdef UNITTESTPP_H
         return UnitTest::RunAllTests();
     #endif

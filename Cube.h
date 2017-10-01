@@ -38,9 +38,9 @@ class Cube{
 
 public:
 
-    static Cube& instance(int _rows = 3, Mode _mode = Mode::TOP_TO_BOTTOM, int _choice = -1)
+    static Cube& instance(int _rows = 3, Mode _mode = Mode::TOP_TO_BOTTOM, int _choice = -1, int _length = 5)
     {
-        static Cube singleton(_rows, Mode::TOP_TO_BOTTOM, _choice);
+        static Cube singleton(_rows, Mode::TOP_TO_BOTTOM, _choice, _length);
         return singleton;
     }
 
@@ -68,7 +68,7 @@ public:
 
 
 
-    void draw(int length = 5,float Cx = 0, float Cy = 0, float Cz = 0);
+    void draw(float Cx = 0, float Cy = 0, float Cz = 0);
     void turn();
     void print(); //for debugging purposes
     void solve(); //apply all turns in history in reverse direction
@@ -79,6 +79,8 @@ public:
     inline void setMode(Mode _mode){return mode.store(_mode);}
     inline Direction getDir()const{return dir.load();}
     inline void setDir(Direction _dir){return dir.store(_dir);}
+    inline int getLength()const{return length;}
+
     void choiceIncrease();
     void choiceDecrease();
     void modeIncrease();
@@ -90,11 +92,19 @@ public:
 
 private:
 
-    Cube(int _rows = 3, Mode _mode = Mode::TOP_TO_BOTTOM, int _choice = -1);
+    Cube(int _rows = 3, Mode _mode = Mode::TOP_TO_BOTTOM, int _choice = -1, int _length = 5);
+
+    inline void setLength(int _length){
+        length = _length;
+        float eps = 0.001;
+        if ( (_length-3) < eps || (_length-30) > eps ){
+            length = 5;
+        }
+    }
 
     void turnClockwise();
     void turnCounterClockwise();
-    void drawCube(int turningDegrees, float length, float Cx, float Cy, float Cz)const;
+    void drawCube(int turningDegrees, float Cx, float Cy, float Cz)const;
 
     void destroy();
 
@@ -102,9 +112,27 @@ private:
     std::atomic<int> choice; //which row of subcubes is currently considered for rotation [0 ; wall_dimention]
     std::atomic<Direction> dir; //which row of subcubes is currently considered for rotation [0 ; wall_dimention]
 
+    int length;
     int rows; // regarding drawing sizes
     CubeSide cubeSide [SIDES_COUNT];
     std::stack<Turn> history;
+
+
+    //TODO
+    //calculate all these in the constructor
+    // replace Cx,Cy,Cz everywhere with a Point object
+    //figure out how to rotate around all 3 axes
+    //vector<Point> top_to_bottom_box_centres
+    //vector<Point> top_to_bottom_subCubes_centres
+
+    //vector<Point> left_to_right_box_centres
+    //vector<Point> left_to_right_subCubes_centres
+
+    //vector<Point> front_to_back_box_centres
+    //vector<Point> front_to_back_subCubes_centres
+
+    //vector<vector<points>> cubeSideTilesCentres;
+
 };
 
 #endif // CUBE_H_INCLUDED

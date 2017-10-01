@@ -6,11 +6,17 @@
 void Cube::destroy(){}
 Cube::~Cube(){destroy();}
 
-Cube::Cube(int _rows, Mode _mode, int _choice):mode(_mode),choice(_choice),rows(_rows){
+Cube::Cube(int _rows, Mode _mode, int _choice, int _length):mode(_mode),choice(_choice),rows(_rows){
     dir = Direction::NEUTRAL;
     for (int i=0;i<SIDES_COUNT;i++){
         getCubeSide()[i] = CubeSide(rows ,static_cast<Color> (i));
     }
+
+    if ( (rows < 2) || (rows > 9)){
+        rows = 3;
+    }
+
+    setLength(_length);
 }
 
 void Cube::choiceDecrease(){

@@ -2,11 +2,15 @@
 #include <iostream>
 #include "UnitTest++.h"
 
-
+#ifdef __WIN32__
+#include "windows.h"
+#endif // __WIN32__
 
 int main()
 {
-
+    #ifdef __WIN32__
+    FreeConsole();
+    #endif // __WIN32__
 
     // unittests are designed for 3x3x3 cube, and will crash with segmentation fault for other dimentions of the cube
     #ifndef UNITTESTPP_H

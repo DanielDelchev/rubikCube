@@ -258,7 +258,7 @@ void Cube::draw(float Cx , float Cy , float Cz){
         modifyPOV();
 
         boolean.lock();
-        std::cout<<turningDegrees<<std::endl;
+        //std::cout<<turningDegrees<<std::endl;
         if ( turning && ((fabs(turningDegrees-90) < rotationSpeedEpsilon) || (fabs(turningDegrees+90) < rotationSpeedEpsilon))){
             turning = false;
             turningDegrees = 0.0f;

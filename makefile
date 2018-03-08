@@ -1,9 +1,15 @@
 CC=mingw32-g++
 CFLAGS=-Wall -std=c++11 -O3
-INCLUDE_DIR=-IC:\Users\nooby\Desktop\Downloads\CodeBlocks16\UnitTest++\unittest-cpp-master\UnitTest++ -IC:\Users\nooby\Desktop\Downloads\CodeBlocks16\EXTRA_moodle\glfw-2.7.bin.WIN32\include 
-Files=main.cpp Cube.cpp CubeSide.cpp GUI.cpp UnitTests.cpp Utilities.cpp
+
+SOURCE_DIR=source
+DEPEND_DIR=.\Dependencies
+INCLUDE_DIR=.\include
+OUTPUT_DIR=build
+
+Files= ${SOURCE_DIR}\main.cpp ${SOURCE_DIR}\Cube.cpp ${SOURCE_DIR}\CubeSide.cpp ${SOURCE_DIR}\GUI.cpp ${SOURCE_DIR}\UnitTests.cpp ${SOURCE_DIR}\Utilities.cpp
 libs=-lglfw -lopengl32 -lglu32 -lgdi32 -lUnitTest++
-LINK_DIR=-LC:\Users\nooby\Desktop\Downloads\CodeBlocks16\UnitTest++\unittest-cpp-master\Deliv\Release -LC:\Users\nooby\Desktop\Downloads\CodeBlocks16\EXTRA_moodle\glfw-2.7.bin.WIN32\lib
+INCLUDE_DIRS=-I${DEPEND_DIR}\UnitTest++\unittest-cpp-master\UnitTest++ -I${DEPEND_DIR}\glfw-2.7.bin.WIN32\include -I${INCLUDE_DIR}
+LINK_DIRS=-L${DEPEND_DIR}\UnitTest++\unittest-cpp-master\Deliv\Release -L${DEPEND_DIR}\glfw-2.7.bin.WIN32\lib
 
 all:
-	${CC} ${Files} -o cube ${CFLAGS} ${INCLUDE_DIR} ${LINK_DIR} ${libs}
+	${CC} ${Files} -o ${OUTPUT_DIR}\cube ${CFLAGS} ${INCLUDE_DIRS} ${LINK_DIRS} ${libs}

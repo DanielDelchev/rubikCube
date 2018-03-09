@@ -1,5 +1,5 @@
 CC=mingw32-g++
-CFLAGS=-Wall -std=c++11 -O3
+CFLAGS=-Wall -std=c++11 -O3 -static
 
 SOURCE_DIR=source
 DEPEND_DIR=.\Dependencies

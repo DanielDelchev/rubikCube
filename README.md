@@ -1,3 +1,3 @@
 OpenGL project.
-Keyboard/scroll Interactive 3D rubick's cube.
-Not finished yet.
+Keyboard/scroll Interactive 3D rubik's cube.
+Under construction.
